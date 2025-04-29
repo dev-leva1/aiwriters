@@ -18,8 +18,15 @@ export const authService = {
   async register(data: RegisterData): Promise<AuthResponse> {
     await loadDb();
     
+    if (!db.data) {
+      throw new Error('База данных не доступна');
+    }
+    
+    // После проверки на null, TypeScript должен понимать, что db.data не null
+    const dbData = db.data;
+    
     // Проверка, существует ли пользователь с таким email
-    const existingUser = db.data.users.find(user => user.email === data.email);
+    const existingUser = dbData.users.find(user => user.email === data.email);
     if (existingUser) {
       throw new Error('Пользователь с таким email уже существует');
     }
@@ -39,7 +46,7 @@ export const authService = {
     };
     
     // Сохранение пользователя в базе
-    db.data.users.push(newUser);
+    dbData.users.push(newUser);
     await db.write();
     
     // Возвращаем DTO пользователя без пароля
@@ -55,8 +62,15 @@ export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     await loadDb();
     
+    if (!db.data) {
+      throw new Error('База данных не доступна');
+    }
+    
+    // После проверки на null, TypeScript должен понимать, что db.data не null
+    const dbData = db.data;
+    
     // Поиск пользователя по email
-    const user = db.data.users.find(user => user.email === credentials.email);
+    const user = dbData.users.find(user => user.email === credentials.email);
     if (!user) {
       throw new Error('Неверный email или пароль');
     }
@@ -105,21 +119,28 @@ export const authService = {
   async updateProfile(userId: string, data: Partial<UserDTO>): Promise<UserDTO> {
     await loadDb();
     
+    if (!db.data) {
+      throw new Error('База данных не доступна');
+    }
+    
+    // После проверки на null, TypeScript должен понимать, что db.data не null
+    const dbData = db.data;
+    
     // Поиск пользователя по ID
-    const userIndex = db.data.users.findIndex(user => user.id === userId);
+    const userIndex = dbData.users.findIndex(user => user.id === userId);
     if (userIndex === -1) {
       throw new Error('Пользователь не найден');
     }
     
     // Обновление данных пользователя
-    const user = db.data.users[userIndex];
+    const user = dbData.users[userIndex];
     const updatedUser = {
       ...user,
       ...data,
       updatedAt: new Date()
     };
     
-    db.data.users[userIndex] = updatedUser;
+    dbData.users[userIndex] = updatedUser;
     await db.write();
     
     // Возвращаем обновленного пользователя
@@ -138,13 +159,20 @@ export const authService = {
   async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
     await loadDb();
     
+    if (!db.data) {
+      throw new Error('База данных не доступна');
+    }
+    
+    // После проверки на null, TypeScript должен понимать, что db.data не null
+    const dbData = db.data;
+    
     // Поиск пользователя по ID
-    const userIndex = db.data.users.findIndex(user => user.id === userId);
+    const userIndex = dbData.users.findIndex(user => user.id === userId);
     if (userIndex === -1) {
       throw new Error('Пользователь не найден');
     }
     
-    const user = db.data.users[userIndex];
+    const user = dbData.users[userIndex];
     
     // Проверка текущего пароля
     const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
@@ -156,7 +184,7 @@ export const authService = {
     const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
     
     // Обновление пароля
-    db.data.users[userIndex] = {
+    dbData.users[userIndex] = {
       ...user,
       passwordHash,
       updatedAt: new Date()
@@ -170,7 +198,14 @@ export const authService = {
   async getUserById(userId: string): Promise<UserDTO | null> {
     await loadDb();
     
-    const user = db.data.users.find(user => user.id === userId);
+    if (!db.data) {
+      return null;
+    }
+    
+    // После проверки на null, TypeScript должен понимать, что db.data не null
+    const dbData = db.data;
+    
+    const user = dbData.users.find(user => user.id === userId);
     if (!user) {
       return null;
     }

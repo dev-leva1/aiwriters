@@ -113,9 +113,12 @@ const defaultErrorResponse = (): AIResponse => {
 export const getStories = async (): Promise<Story[]> => {
   await loadDb();
   
+  // Проверяем, что db.data не null
+  if (!db.data) return [];
+  
   // Получаем все истории и добавляем информацию об авторах
   const stories = [...db.data.stories].map(story => {
-    const author = db.data.users.find(user => user.id === story.authorId);
+    const author = db.data?.users.find(user => user.id === story.authorId);
     if (author) {
       const { passwordHash, ...authorData } = author;
       story.author = authorData;
@@ -129,11 +132,14 @@ export const getStories = async (): Promise<Story[]> => {
 export const getStoryById = async (id: string): Promise<Story | undefined> => {
   await loadDb();
   
+  // Проверяем, что db.data не null
+  if (!db.data) return undefined;
+  
   const story = db.data.stories.find(story => story.id === id);
   if (!story) return undefined;
   
   // Добавляем информацию об авторе
-  const author = db.data.users.find(user => user.id === story.authorId);
+  const author = db.data?.users.find(user => user.id === story.authorId);
   if (author) {
     const { passwordHash, ...authorData } = author;
     story.author = authorData;
@@ -141,7 +147,7 @@ export const getStoryById = async (id: string): Promise<Story | undefined> => {
   
   // Добавляем информацию об авторах комментариев
   story.comments = story.comments.map(comment => {
-    const commentAuthor = db.data.users.find(user => user.id === comment.authorId);
+    const commentAuthor = db.data?.users.find(user => user.id === comment.authorId);
     if (commentAuthor) {
       const { passwordHash, ...authorData } = commentAuthor;
       comment.author = authorData;
@@ -154,6 +160,11 @@ export const getStoryById = async (id: string): Promise<Story | undefined> => {
 
 export const createStory = async (story: Omit<Story, 'id' | 'createdAt' | 'updatedAt' | 'likes' | 'comments'>): Promise<Story> => {
   await loadDb();
+  
+  // Проверяем, что db.data не null
+  if (!db.data) {
+    throw new Error('База данных не доступна');
+  }
   
   const newStory: Story = {
     ...story,
@@ -240,6 +251,11 @@ export const createStory = async (story: Omit<Story, 'id' | 'createdAt' | 'updat
 export const addComment = async (storyId: string, comment: Omit<Comment, 'id' | 'createdAt'>): Promise<Comment> => {
   await loadDb();
   
+  // Проверяем, что db.data не null
+  if (!db.data) {
+    throw new Error('База данных не доступна');
+  }
+  
   // Создаем новый комментарий
   const newComment: Comment = {
     ...comment,
@@ -270,6 +286,9 @@ export const addComment = async (storyId: string, comment: Omit<Comment, 'id' | 
 export const likeStory = async (storyId: string): Promise<Story | undefined> => {
   await loadDb();
   
+  // Проверяем, что db.data не null
+  if (!db.data) return undefined;
+  
   // Находим историю для добавления лайка
   const storyIndex = db.data.stories.findIndex(s => s.id === storyId);
   if (storyIndex !== -1) {
@@ -296,10 +315,16 @@ export const likeStory = async (storyId: string): Promise<Story | undefined> => 
 export const getUserStories = async (userId: string): Promise<Story[]> => {
   await loadDb();
   
-  const userStories = db.data.stories
+  // Проверяем, что db.data не null
+  if (!db.data) return [];
+  
+  // После проверки на null, TypeScript должен понимать, что db.data не null
+  const dbData = db.data; // создаем копию переменной, чтобы TypeScript не терял информацию о типе
+  
+  const userStories = dbData.stories
     .filter(story => story.authorId === userId)
     .map(story => {
-      const author = db.data.users.find(user => user.id === story.authorId);
+      const author = dbData.users.find(user => user.id === story.authorId);
       if (author) {
         const { passwordHash, ...authorData } = author;
         story.author = authorData;
@@ -314,11 +339,19 @@ export const getUserStories = async (userId: string): Promise<Story[]> => {
 export const getOrCreateAIUser = async (): Promise<UserDTO> => {
   await loadDb();
   
-  let aiUser = db.data.users.find(user => user.username === 'AIAssistant');
+  if (!db.data) {
+    throw new Error('База данных не доступна');
+  }
   
+  // После проверки на null, TypeScript должен понимать, что db.data не null
+  const dbData = db.data; // создаем копию переменной, чтобы TypeScript не терял информацию о типе
+  
+  let aiUser = dbData.users.find(user => user.username === 'AIAssistant');
+  
+  // Если ИИ пользователя нет, создаем его
   if (!aiUser) {
-    aiUser = {
-      id: generateStoryId(), // Используем тот же генератор для простоты
+    const newAiUser = {
+      id: generateStoryId(),
       username: 'AIAssistant',
       email: 'ai@aiwriters.app',
       passwordHash: 'no_password',
@@ -326,10 +359,13 @@ export const getOrCreateAIUser = async (): Promise<UserDTO> => {
       bio: 'Искусственный интеллект, помогающий оценивать произведения',
       createdAt: new Date()
     };
-    db.data.users.push(aiUser);
+    dbData.users.push(newAiUser);
     await db.write();
+    
+    const { passwordHash, ...aiUserData } = newAiUser;
+    return aiUserData;
+  } else {
+    const { passwordHash, ...aiUserData } = aiUser;
+    return aiUserData;
   }
-  
-  const { passwordHash, ...aiUserDTO } = aiUser;
-  return aiUserDTO;
 }; 

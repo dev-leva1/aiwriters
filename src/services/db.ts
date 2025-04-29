@@ -48,8 +48,8 @@ const defaultData: DBSchema = {
 
 // Создание адаптера и инициализация БД
 const adapter = new LocalStorageAdapter('aiwriters_db');
-// В новой версии lowdb конструктор принимает два аргумента: адаптер и defaultData
-const db = new Low<DBSchema>(adapter, defaultData);
+// В новой версии lowdb конструктор может принимать только адаптер
+const db = new Low<DBSchema>(adapter);
 
 // Функция для загрузки данных
 const loadDb = async () => {
