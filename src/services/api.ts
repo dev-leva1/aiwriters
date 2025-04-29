@@ -5,9 +5,9 @@ import { authService } from './authService';
 
 // Используем фейковый API ключ в примере
 // В реальном приложении ключ должен храниться в .env файле
-const OPENROUTER_API_KEY = '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'; // Замените на реальный API ключ
-const SITE_URL = 'https://aiwriters.app'; // Замените на ваш URL
-const SITE_NAME = 'AI Writers';
+const OPENROUTER_API_KEY = process.env.REACT_APP_OPENROUTER_API_KEY || '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'; // Замените на реальный API ключ
+const SITE_URL = window.location.origin; // Динамически определяем URL сайта
+const SITE_NAME = 'AI Writers App';
 
 const api = axios.create({
   baseURL: 'https://openrouter.ai/api/v1',
