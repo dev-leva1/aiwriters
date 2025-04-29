@@ -1,7 +1,7 @@
 # ✍️ AIWriters
 
 ![Статус разработки](https://img.shields.io/badge/Статус-В_разработке-yellow)
-![Версия](https://img.shields.io/badge/Версия-0.1.0-blue)
+![Версия](https://img.shields.io/badge/Версия-0.2.0-blue)
 ![React](https://img.shields.io/badge/React-19.1.0-61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-3178c6)
 
