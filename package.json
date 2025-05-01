@@ -1,6 +1,6 @@
 {
   "name": "aiwriters",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@chakra-ui/react": "^2.8.0",
@@ -11,8 +11,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.40",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7",
     "axios": "^1.4.0",
     "framer-motion": "^10.15.1",
     "lowdb": "^5.1.0",
@@ -46,5 +44,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.3"
   }
 }

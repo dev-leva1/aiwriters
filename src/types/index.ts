@@ -48,6 +48,9 @@ export interface Story {
   updatedAt: Date;
   genre?: string;
   tags?: string[];
+  reposts?: number;
+  attachments?: Attachment[];
+  views?: number;
 }
 
 export interface Comment {
@@ -76,4 +79,12 @@ export interface AIResponse {
     title: string;
     content: string;
   };
+}
+
+export interface Attachment {
+  id: string;
+  type: 'image' | 'file';
+  url: string;
+  filename?: string;
+  storyId: string;
 } 

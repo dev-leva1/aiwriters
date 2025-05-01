@@ -1,24 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Story, AIRating } from '../types';
+import { Story, AIRating, Attachment } from '../types';
 
 interface StoryCardProps {
   story: Story & {
     aiGenerated?: boolean;
-    views?: number; 
+    views?: number;
+    reposts?: number;
   };
 }
 
 const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
   // Определяет класс для рейтинга в зависимости от значения
   const getRatingClass = (score: AIRating | undefined): string => {
-    if (!score) return 'rating-poor';
+    if (!score) return '';
     const overallScore = score.overallScore;
-    if (overallScore >= 4.5) return 'rating-excellent';
-    if (overallScore >= 3.5) return 'rating-good';
-    if (overallScore >= 2.5) return 'rating-average';
-    if (overallScore >= 1.5) return 'rating-below-average';
-    return 'rating-poor';
+    if (overallScore >= 4.5) return 'text-success';
+    if (overallScore >= 3.5) return 'text-primary';
+    if (overallScore >= 2.5) return '';
+    if (overallScore >= 1.5) return 'text-warning';
+    return 'text-danger';
   };
 
   // Форматирование даты создания
@@ -31,184 +32,150 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
     : 'Неизвестная дата';
 
   // Лимитирует количество символов в контенте
-  const truncateContent = (content: string, maxLength = 150) => {
+  const truncateContent = (content: string, maxLength = 280) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
 
+  // Форматирование контента для отображения с базовой разметкой
+  const formatContent = (content: string): string => {
+    let formattedContent = content;
+    
+    // Заменяем **текст** на <strong>текст</strong> для жирного текста
+    formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Заменяем *текст* на <em>текст</em> для курсива
+    formattedContent = formattedContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Скрываем другие виды форматирования Markdown, чтобы они не отображались в карточке
+    formattedContent = formattedContent
+      .replace(/#{1,3}\s(.*?)\n/g, '$1')  // Удаляем заголовки
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')  // Ссылки показываем только текст
+      .replace(/`([^`]+)`/g, '$1');  // Код показываем как обычный текст
+
+    return truncateContent(formattedContent);
+  };
+
+  // Проверяем наличие прикрепленных изображений
+  const hasAttachments = story.attachments && story.attachments.length > 0;
+  
+  // Получаем количество вложений или 0, если их нет
+  const attachmentsCount = story.attachments?.length || 0;
+
   return (
-    <div className="story-card" style={{
-      position: 'relative',
-      border: '1px solid rgba(0, 229, 255, 0.2)',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      transition: 'all 0.3s ease',
-      background: 'linear-gradient(135deg, var(--dark-surface) 0%, var(--dark-surface-2) 100%)',
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.1)',
-      margin: '15px 0',
+    <div className="story-card" style={{ 
+      border: '1px solid var(--border-color)', 
+      borderRadius: '16px', 
+      padding: '16px', 
+      marginBottom: '16px',
+      backgroundColor: 'var(--background)'
     }}>
-      {/* Неоновая граница при наведении (через CSS переменные) */}
-      <style>{`
-        .story-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 229, 255, 0.2);
-          border: 1px solid var(--primary-color);
-        }
-        .story-card:hover .story-card-title {
-          color: var(--primary-color);
-        }
-        .story-card:hover .glow-effect {
-          opacity: 1;
-        }
-        .tags-container::-webkit-scrollbar {
-          height: 4px;
-          background: var(--dark-surface-2);
-        }
-        .tags-container::-webkit-scrollbar-thumb {
-          background: var(--primary-color);
-          border-radius: 2px;
-        }
-      `}</style>
-      
-      {/* Эффект свечения по краям */}
-      <div className="glow-effect" style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        boxShadow: 'inset 0 0 10px var(--primary-color)',
-        pointerEvents: 'none',
-        opacity: 0,
-        transition: 'opacity 0.3s ease',
-        borderRadius: '8px',
-        zIndex: 1
-      }}></div>
-      
-      {/* Заголовок карточки */}
-      <div className="story-card-header" style={{
-        padding: '15px 20px',
-        borderBottom: '1px solid rgba(0, 229, 255, 0.1)',
-        background: 'var(--dark-surface-2)',
-        position: 'relative',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <Link to={`/stories/${story.id}`} style={{ textDecoration: 'none', display: 'block', width: '80%' }}>
-          <h3 className="story-card-title" style={{
-            margin: '0',
-            fontSize: '1.3rem',
-            fontWeight: 'bold',
-            color: 'var(--text-color)',
-            transition: 'color 0.3s ease',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+      <div className="story-card-header">
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+          <div className="avatar" style={{ width: '48px', height: '48px', marginRight: '12px' }}>
+            <img src={story.author?.avatar || 'https://api.dicebear.com/6.x/avataaars/svg?seed=default'} alt={story.author?.username || 'Автор'} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
+          <div>
+            <div style={{ fontWeight: '700' }}>{story.author?.username || 'Неизвестный автор'}</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>@{story.author?.username?.toLowerCase().replace(/\s+/g, '') || 'user'}</div>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {story.aiGenerated && (
+              <div style={{
+                background: 'var(--primary-light)',
+                color: 'var(--primary-color)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: '700'
+              }}>
+                AI
+              </div>
+            )}
+            <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{formattedDate}</div>
+          </div>
+        </div>
+        
+        <Link to={`/stories/${story.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <h3 className="story-card-title" style={{ 
+            fontSize: '18px', 
+            fontWeight: 'bold', 
+            marginBottom: '10px',
+            color: 'var(--text-primary)'
           }}>
             {story.title}
           </h3>
         </Link>
-        
-        {story.aiGenerated && (
-          <div className="ai-badge" style={{
-            background: 'linear-gradient(135deg, #4a00e0, #8e2de2)',
-            color: 'white',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '0.7rem',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            boxShadow: '0 4px 10px rgba(142, 45, 226, 0.4)',
-            backdropFilter: 'blur(5px)'
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '4px' }}>
-              <path d="M21 12.5C21 17.1944 17.1944 21 12.5 21C7.80558 21 4 17.1944 4 12.5C4 7.80558 7.80558 4 12.5 4C17.1944 4 21 7.80558 21 12.5Z" stroke="white" strokeWidth="2" />
-              <path d="M12.5 8V12.5L15.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            AI
-          </div>
-        )}
       </div>
       
-      {/* Тело карточки */}
-      <div className="story-card-body" style={{ padding: '15px 20px' }}>
-        <div className="meta-info" style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '10px',
-          fontSize: '0.85rem',
-          color: 'var(--muted-color)'
-        }}>
-          <div className="author" style={{ display: 'flex', alignItems: 'center' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '5px' }}>
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 6C13.93 6 15.5 7.57 15.5 9.5C15.5 11.43 13.93 13 12 13C10.07 13 8.5 11.43 8.5 9.5C8.5 7.57 10.07 6 12 6ZM12 20C9.97 20 8.15 19.25 6.86 18.05C6.6 17.81 6.5 17.44 6.61 17.11C7.2 15.4 8.97 14 12 14C15.03 14 16.8 15.4 17.39 17.11C17.5 17.44 17.4 17.81 17.14 18.05C15.85 19.25 14.03 20 12 20Z" fill="var(--muted-color)" />
-            </svg>
-            {story.author?.username || 'Неизвестный автор'}
+      <div className="story-card-body">
+        <Link to={`/stories/${story.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div style={{ 
+            color: 'var(--text-primary)',
+            marginBottom: '15px',
+            lineHeight: '1.5'
+          }}
+          dangerouslySetInnerHTML={{ __html: formatContent(story.content) }}>
           </div>
-          <div className="divider" style={{ margin: '0 10px', color: 'var(--muted-color)' }}>•</div>
-          <div className="date" style={{ display: 'flex', alignItems: 'center' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '5px' }}>
-              <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="var(--muted-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {formattedDate}
-          </div>
-          {story.genre && (
-            <>
-              <div className="divider" style={{ margin: '0 10px', color: 'var(--muted-color)' }}>•</div>
-              <div className="genre" style={{ 
-                background: 'rgba(0, 229, 255, 0.1)', 
-                padding: '2px 8px', 
-                borderRadius: '30px',
-                fontSize: '0.8rem',
-                color: 'var(--primary-color)',
-                border: '1px solid rgba(0, 229, 255, 0.2)'
-              }}>
-                {story.genre}
-              </div>
-            </>
-          )}
-        </div>
+        </Link>
         
-        <div className="content-preview" style={{ 
-          color: 'var(--text-color)',
-          marginBottom: '15px',
-          lineHeight: '1.6',
-          position: 'relative'
-        }}>
-          {truncateContent(story.content)}
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '30px',
-            background: 'linear-gradient(to top, var(--dark-surface), transparent)',
-            pointerEvents: 'none'
-          }}></div>
-        </div>
-        
-        {story.tags && story.tags.length > 0 && (
-          <div className="tags-container" style={{
-            display: 'flex',
-            flexWrap: 'nowrap',
+        {hasAttachments && (
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: attachmentsCount === 1 ? '1fr' : attachmentsCount === 3 ? '1fr 1fr 1fr' : '1fr 1fr',
             gap: '8px',
             marginBottom: '15px',
-            overflowX: 'auto',
-            paddingBottom: '5px'
+            borderRadius: '16px',
+            overflow: 'hidden'
+          }}>
+            {story.attachments?.map((attachment: Attachment, index: number) => (
+              <div key={index} style={{ position: 'relative', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden' }}>
+                {attachment.type === 'image' ? (
+                  <img src={attachment.url} alt="Изображение к истории" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--background-light)'
+                  }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {story.genre && (
+          <div style={{ 
+            display: 'inline-block',
+            background: 'var(--primary-light)', 
+            padding: '5px 15px', 
+            borderRadius: '9999px',
+            fontSize: '14px',
+            color: 'var(--primary-color)',
+            marginBottom: '10px',
+            fontWeight: 'bold'
+          }}>
+            {story.genre}
+          </div>
+        )}
+        
+        {story.tags && story.tags.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginBottom: '15px'
           }}>
             {story.tags.map((tag: string, index: number) => (
-              <span key={index} className="tag" style={{
-                background: 'rgba(0, 229, 255, 0.05)',
-                color: 'var(--primary-color)',
-                padding: '3px 10px',
-                borderRadius: '30px',
-                fontSize: '0.8rem',
-                whiteSpace: 'nowrap',
-                border: '1px solid rgba(0, 229, 255, 0.1)',
-                transition: 'all 0.3s ease'
-              }}>
+              <span key={index} className="tag" style={{ color: 'var(--primary-color)', fontSize: '14px' }}>
                 #{tag}
               </span>
             ))}
@@ -216,85 +183,70 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
         )}
       </div>
       
-      {/* Футер карточки */}
-      <div className="story-card-footer" style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+      <div className="story-card-footer" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
         alignItems: 'center',
-        padding: '10px 20px',
-        borderTop: '1px solid rgba(0, 229, 255, 0.1)',
-        background: 'rgba(0, 0, 0, 0.2)'
+        marginTop: '15px',
+        borderTop: '1px solid var(--border-color)',
+        paddingTop: '15px'
       }}>
-        <div className="interactions" style={{ display: 'flex', alignItems: 'center' }}>
-          <div className="likes" style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            marginRight: '15px',
-            color: 'var(--secondary-color)'
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '5px' }}>
-              <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z" fill="var(--secondary-color)" fillOpacity="0.5" />
-            </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+            </div>
+            {story.comments?.length || 0}
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 2l4 4-4 4"></path>
+                <path d="M3 11v-1a4 4 0 0 1 4-4h14"></path>
+                <path d="M7 22l-4-4 4-4"></path>
+                <path d="M21 13v1a4 4 0 0 1-4 4H3"></path>
+              </svg>
+            </div>
+            {story.reposts || 0}
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
             {story.likes || 0}
           </div>
           
-          <div className="views" style={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            color: 'var(--text-color)'
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '5px' }}>
-              <path d="M12 6C15.79 6 19.17 8.13 20.82 11.5C19.17 14.87 15.79 17 12 17C8.21 17 4.83 14.87 3.18 11.5C4.83 8.13 8.21 6 12 6ZM12 4C7 4 2.73 7.11 1 11.5C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 11.5C21.27 7.11 17 4 12 4ZM12 9C13.38 9 14.5 10.12 14.5 11.5C14.5 12.88 13.38 14 12 14C10.62 14 9.5 12.88 9.5 11.5C9.5 10.12 10.62 9 12 9ZM12 7C9.52 7 7.5 9.02 7.5 11.5C7.5 13.98 9.52 16 12 16C14.48 16 16.5 13.98 16.5 11.5C16.5 9.02 14.48 7 12 7Z" fill="var(--text-color)" fillOpacity="0.5" />
-            </svg>
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
             {story.views || 0}
           </div>
         </div>
         
-        {story.aiRating !== undefined && (
-          <div 
-            className={`ai-rating ${getRatingClass(story.aiRating)}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(5px)',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-              fontSize: '0.9rem',
-              fontWeight: 'bold'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '5px' }}>
-              <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" fill="currentColor" />
+        {story.aiRating && (
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            color: story.aiRating.overallScore >= 3.5 ? 'var(--primary-color)' : 'var(--text-secondary)'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
-            <span>{story.aiRating.overallScore.toFixed(1)}</span>
+            <span className={getRatingClass(story.aiRating)}>
+              {story.aiRating.overallScore.toFixed(1)}
+            </span>
           </div>
         )}
-        
-        <Link 
-          to={`/stories/${story.id}`} 
-          className="read-more-button"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '5px 12px',
-            borderRadius: '4px',
-            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-            color: 'var(--dark-bg)',
-            textDecoration: 'none',
-            fontSize: '0.85rem',
-            fontWeight: 'bold',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 10px rgba(0, 229, 255, 0.3)',
-            border: 'none'
-          }}
-        >
-          Читать
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '5px' }}>
-            <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="currentColor" />
-          </svg>
-        </Link>
       </div>
     </div>
   );

@@ -52,48 +52,40 @@ const LoginPage: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <div className="container" style={{ maxWidth: '500px', margin: '30px auto' }}>
-        <div className="card login-card" style={{ 
-          background: 'linear-gradient(135deg, var(--dark-surface) 0%, var(--dark-surface-2) 100%)',
-          border: '1px solid rgba(0, 229, 255, 0.2)',
-          boxShadow: '0 15px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 229, 255, 0.1)',
+      <div className="container" style={{ maxWidth: '400px', margin: '40px auto' }}>
+        <div style={{ 
+          background: 'var(--background)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '16px',
+          overflow: 'hidden'
         }}>
-          <div className="card-header" style={{ 
+          <div style={{ 
             textAlign: 'center', 
-            borderBottom: '2px solid var(--primary-color)',
-            padding: '1.25rem'
+            padding: '24px 16px'
           }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+            </svg>
             <h2 style={{ 
-              color: 'var(--primary-color)', 
-              margin: 0,
-              textShadow: '0 0 10px rgba(0, 229, 255, 0.3)'
+              color: 'var(--text-primary)', 
+              margin: '0 0 8px 0',
+              fontSize: '24px',
+              fontWeight: '700'
             }}>
-              Вход в аккаунт
+              Вход в AI Writers
             </h2>
           </div>
           
-          <div className="card-body" style={{ padding: '2rem' }}>
+          <div style={{ padding: '0 32px 32px' }}>
             {errorMessage && (
-              <div className="error-message" style={{ 
-                marginBottom: '1.5rem',
-                padding: '0.75rem 1rem',
-                background: 'rgba(244, 67, 54, 0.1)',
-                borderLeft: '4px solid var(--danger-color)',
-                color: 'var(--danger-color)',
-                borderRadius: '4px'
-              }}>
+              <div className="error-message">
                 {errorMessage}
               </div>
             )}
             
             <form onSubmit={handleSubmit}>
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label htmlFor="email" style={{ 
-                  display: 'block', 
-                  marginBottom: '0.5rem', 
-                  color: 'var(--primary-color)',
-                  fontWeight: 'bold'
-                }}>
+              <div className="form-group">
+                <label htmlFor="email">
                   Email
                 </label>
                 <input
@@ -104,25 +96,11 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
                   placeholder="Введите ваш email"
-                  style={{ 
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: 'var(--dark-surface-2)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)',
-                    transition: 'border-color 0.3s ease',
-                  }}
                 />
               </div>
               
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label htmlFor="password" style={{ 
-                  display: 'block', 
-                  marginBottom: '0.5rem', 
-                  color: 'var(--primary-color)',
-                  fontWeight: 'bold'
-                }}>
+              <div className="form-group">
+                <label htmlFor="password">
                   Пароль
                 </label>
                 <input
@@ -133,15 +111,6 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSubmitting}
                   placeholder="Введите ваш пароль"
-                  style={{ 
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: 'var(--dark-surface-2)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)',
-                    transition: 'border-color 0.3s ease',
-                  }}
                 />
               </div>
               
@@ -151,28 +120,21 @@ const LoginPage: React.FC = () => {
                 disabled={isSubmitting}
                 style={{ 
                   width: '100%',
-                  padding: '0.75rem',
-                  background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
-                  border: 'none',
-                  borderRadius: '30px',
-                  color: 'var(--dark-bg)',
-                  fontWeight: 'bold',
-                  marginBottom: '1rem',
-                  boxShadow: '0 4px 15px rgba(0, 229, 255, 0.3)',
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                  opacity: isSubmitting ? 0.7 : 1
+                  padding: '12px',
+                  fontWeight: '700',
+                  marginBottom: '16px',
+                  marginTop: '8px'
                 }}
               >
                 {isSubmitting ? 'Вход...' : 'Войти'}
               </button>
               
-              <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>
+              <div style={{ textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)' }}>
                 Еще нет аккаунта?{' '}
                 <Link to="/register" style={{ 
                   color: 'var(--primary-color)',
                   textDecoration: 'none',
-                  fontWeight: 'bold',
-                  transition: 'all 0.3s ease'
+                  fontWeight: '600'
                 }}>
                   Зарегистрироваться
                 </Link>
