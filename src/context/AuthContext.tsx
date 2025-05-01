@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Проверка сессии при загрузке
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
         const currentUser = authService.getCurrentUser();
         if (currentUser) {
@@ -113,20 +113,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
   };
 
+  const contextValue: AuthContextType = {
+    user, 
+    isAuthenticated,
+    isLoading,
+    login, 
+    register,
+    logout, 
+    updateProfile,
+    error,
+    clearError
+  };
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated,
-        isLoading,
-        login, 
-        register,
-        logout, 
-        updateProfile,
-        error,
-        clearError
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

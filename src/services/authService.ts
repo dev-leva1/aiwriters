@@ -1,9 +1,23 @@
-import bcrypt from 'bcryptjs';
 import { db, generateUserId, loadDb } from './db';
 import { User, UserDTO, LoginCredentials, RegisterData, AuthResponse } from '../types';
 
+// Вспомогательные функции для хеширования паролей
+const hashPassword = async (password: string): Promise<string> => {
+  // Используем стандартный способ хеширования паролей в браузере
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+const comparePasswords = async (password: string, hashedPassword: string): Promise<boolean> => {
+  const passwordHash = await hashPassword(password);
+  return passwordHash === hashedPassword;
+};
+
 // Константы
-const SALT_ROUNDS = 10;
 const LOCAL_STORAGE_KEY = 'ai_writers_auth';
 
 // Вспомогательные функции
@@ -32,7 +46,7 @@ export const authService = {
     }
 
     // Хэширование пароля
-    const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
+    const passwordHash = await hashPassword(data.password);
     
     // Создание нового пользователя
     const newUser: User = {
@@ -76,7 +90,7 @@ export const authService = {
     }
     
     // Проверка пароля
-    const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
+    const isPasswordValid = await comparePasswords(credentials.password, user.passwordHash);
     if (!isPasswordValid) {
       throw new Error('Неверный email или пароль');
     }
@@ -175,13 +189,13 @@ export const authService = {
     const user = dbData.users[userIndex];
     
     // Проверка текущего пароля
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    const isPasswordValid = await comparePasswords(currentPassword, user.passwordHash);
     if (!isPasswordValid) {
       throw new Error('Текущий пароль неверен');
     }
     
     // Хэширование нового пароля
-    const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    const passwordHash = await hashPassword(newPassword);
     
     // Обновление пароля
     dbData.users[userIndex] = {

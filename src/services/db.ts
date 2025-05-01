@@ -1,25 +1,10 @@
-import { Low } from 'lowdb';
 import { User, Story, Comment } from '../types';
 
-// Адаптер для LocalStorage
-class LocalStorageAdapter {
-  private _key: string;
-
-  constructor(key: string) {
-    this._key = key;
-  }
-
-  async read(): Promise<any> {
-    const value = localStorage.getItem(this._key);
-    if (value === null) {
-      return null;
-    }
-    return JSON.parse(value);
-  }
-
-  async write(data: any): Promise<void> {
-    localStorage.setItem(this._key, JSON.stringify(data));
-  }
+// Тип для Low из lowdb
+interface Low<T> {
+  data: T | null;
+  read: () => Promise<void>;
+  write: () => Promise<void>;
 }
 
 // Определение структуры данных
@@ -46,13 +31,60 @@ const defaultData: DBSchema = {
   }
 };
 
-// Создание адаптера и инициализация БД
+// Класс адаптера для LocalStorage 
+class LocalStorageAdapter {
+  private key: string;
+  
+  constructor(key: string) {
+    this.key = key;
+  }
+  
+  async read(): Promise<DBSchema | null> {
+    const data = localStorage.getItem(this.key);
+    if (data === null) {
+      return null;
+    }
+    try {
+      return JSON.parse(data) as DBSchema;
+    } catch (error) {
+      return null;
+    }
+  }
+  
+  async write(data: DBSchema): Promise<void> {
+    localStorage.setItem(this.key, JSON.stringify(data));
+  }
+}
+
+// Создание адаптера
 const adapter = new LocalStorageAdapter('aiwriters_db');
-// В новой версии lowdb конструктор может принимать только адаптер
-const db = new Low<DBSchema>(adapter);
+
+// Создадим заглушку для db, пока не загрузим настоящий объект
+let db: Low<DBSchema> = {
+  data: null,
+  read: async () => { /* заглушка, ничего не возвращает */ },
+  write: async () => { /* заглушка, ничего не возвращает */ }
+};
+
+// Асинхронно инициализируем db
+let isDbInitialized = false;
+const initDb = async () => {
+  if (isDbInitialized) return;
+  
+  try {
+    // Динамический импорт lowdb
+    const { Low } = await import('lowdb');
+    db = new Low<DBSchema>(adapter);
+    isDbInitialized = true;
+  } catch (error) {
+    console.error('Ошибка при импорте lowdb:', error);
+  }
+};
 
 // Функция для загрузки данных
 const loadDb = async () => {
+  await initDb();
+  
   try {
     await db.read();
     // Если данных нет, будут использованы defaultData
