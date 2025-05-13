@@ -42,7 +42,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, storyId, onCo
 
   return (
     <div>
-      <h3>Комментарии ({comments.length})</h3>
+      <h3 style={{ color: 'var(--text-primary)', marginBottom: '16px' }}>Комментарии ({comments.length})</h3>
       
       {isAuthenticated ? (
         <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
@@ -64,7 +64,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, storyId, onCo
           </button>
         </form>
       ) : (
-        <p style={{ marginBottom: '20px' }}>Войдите, чтобы оставить комментарий</p>
+        <p style={{ marginBottom: '20px', color: 'var(--text-secondary)' }}>Войдите, чтобы оставить комментарий</p>
       )}
       
       <div>
@@ -84,18 +84,18 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, storyId, onCo
                     />
                   </div>
                   <div>
-                    <strong>{comment.isAI ? 'ИИ Критик' : comment.author?.username || 'Пользователь'}</strong>
-                    <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>{comment.isAI ? 'ИИ Критик' : comment.author?.username || 'Пользователь'}</strong>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                       {new Date(comment.createdAt).toLocaleString()}
                     </div>
                   </div>
                 </div>
-                <p style={{ whiteSpace: 'pre-wrap' }}>{comment.content}</p>
+                <p style={{ whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>{comment.content}</p>
               </div>
             </div>
           ))
         ) : (
-          <p>Комментариев пока нет</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Комментариев пока нет</p>
         )}
       </div>
     </div>

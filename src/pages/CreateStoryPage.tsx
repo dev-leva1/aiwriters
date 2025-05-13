@@ -313,705 +313,485 @@ const CreateStoryPage: React.FC = () => {
   ];
 
   return (
-    <div className="x-create-story-page">
+    <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navbar />
-      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-        <div style={{
-          background: 'var(--background)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          marginTop: '20px'
-        }}>
-          {/* Tabs */}
-          <div style={{
-            display: 'flex',
-            borderBottom: '1px solid var(--border-color)',
+      <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <h1 style={{ fontSize: '2rem', color: 'var(--text-primary)' }}>Создание истории</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Поделитесь своим творчеством с сообществом</p>
+        </div>
+        
+        {error && (
+          <div style={{ 
+            padding: '12px', 
+            backgroundColor: 'rgba(224, 36, 36, 0.1)', 
+            borderRadius: '8px', 
+            color: 'var(--danger-color)', 
+            marginBottom: '20px',
+            border: '1px solid var(--danger-color)'
           }}>
-            <button
-              onClick={() => setCurrentTab('write')}
-              style={{
-                flex: 1,
-                padding: '15px',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: currentTab === 'write' ? '2px solid var(--primary-color)' : 'none',
-                color: currentTab === 'write' ? 'var(--primary-color)' : 'var(--text-primary)',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              Создание
-            </button>
-            <button
-              onClick={() => setCurrentTab('preview')}
-              style={{
-                flex: 1,
-                padding: '15px',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: currentTab === 'preview' ? '2px solid var(--primary-color)' : 'none',
-                color: currentTab === 'preview' ? 'var(--primary-color)' : 'var(--text-primary)',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              Предпросмотр
-            </button>
+            {error}
           </div>
-
-          {/* Error message */}
-          {error && (
-            <div style={{ 
-              padding: '15px',
-              margin: '15px',
-              background: 'rgba(244, 33, 46, 0.1)',
-              color: 'var(--danger-color)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-                {error}
-              </div>
-            )}
-            
-          {/* Editor Container */}
-          <div style={{ padding: '20px' }}>
-            {/* Write Tab */}
-            {currentTab === 'write' && (
+        )}
+        
+        <div style={{ 
+          display: 'flex', 
+          gap: '20px',
+          flexDirection: isExpanded ? 'column' : 'row'
+        }}>
+          <div style={{ 
+            flex: 3,
+            backgroundColor: 'var(--card-bg)',
+            padding: '20px',
+            borderRadius: '16px',
+            border: '1px solid var(--border-color)'
+          }}>
             <form onSubmit={handleSubmit}>
-                {/* Header with profile pic */}
-                <div style={{ display: 'flex', marginBottom: '20px', alignItems: 'flex-start' }}>
-                  <div style={{ 
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    marginRight: '15px'
-                  }}>
-                    <img 
-                      src={user?.avatar || 'https://api.dicebear.com/6.x/avataaars/svg?seed=default'} 
-                      alt="Аватар" 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-                  
-                  <div style={{ flex: 1 }}>
-                    {/* Visibility options */}
-                    <div style={{ 
-                      display: 'inline-flex',
-                      padding: '0 10px',
-                      height: '32px',
-                      alignItems: 'center', 
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '16px',
-                      color: 'var(--primary-color)',
-                  fontWeight: 'bold', 
-                      fontSize: '14px',
-                      marginBottom: '15px',
-                      cursor: 'pointer'
-                    }}>
-                      <span>Все</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '5px' }}>
-                        <path d="M6 9l6 6 6-6"></path>
-                      </svg>
-                    </div>
-                    
-                    {/* Title input */}
+              <div style={{ marginBottom: '20px' }}>
+                <label htmlFor="title" style={{ display: 'block', marginBottom: '5px', color: 'var(--text-secondary)' }}>
+                  Название
+                </label>
                 <input
                   type="text"
+                  id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Заголовок истории"
-                      style={{
-                        width: '100%',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: 'var(--text-primary)',
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        marginBottom: '15px',
-                        padding: '5px 0'
-                      }}
-                  required
-                    />
-                    
-                    {/* Content textarea */}
-                    <textarea
-                      ref={contentRef}
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      onInput={handleTextareaInput}
-                      placeholder="Расскажите свою историю..."
+                  className="form-control"
+                  placeholder="Введите название вашей истории"
                   style={{ 
-                        width: '100%',
-                        minHeight: isExpanded ? '350px' : '150px',
+                    width: '100%',
+                    padding: '10px 15px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)',
+                    fontSize: '1.1rem'
+                  }}
+                />
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                  <label htmlFor="content" style={{ color: 'var(--text-secondary)' }}>
+                    Содержание
+                  </label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTab('write')}
+                      style={{ 
                         background: 'transparent',
                         border: 'none',
-                        outline: 'none',
-                        color: 'var(--text-primary)',
-                        fontSize: '18px',
-                        lineHeight: '1.6',
-                        resize: 'none',
-                        padding: '0',
-                        marginBottom: '15px'
+                        color: currentTab === 'write' ? 'var(--accent-color)' : 'var(--text-secondary)',
+                        fontWeight: currentTab === 'write' ? 'bold' : 'normal',
+                        cursor: 'pointer',
+                        padding: '0 10px'
                       }}
-                      required
-                    />
-                    
-                    {/* Attachments preview */}
-                    {attachmentPreviews.length > 0 && (
-                      <div style={{ 
-                        display: 'grid',
-                        gridTemplateColumns: attachmentPreviews.length === 1 ? '1fr' : attachmentPreviews.length === 3 ? '1fr 1fr 1fr' : '1fr 1fr',
-                        gap: '10px',
-                        marginBottom: '20px',
-                    border: '1px solid var(--border-color)',
-                        borderRadius: '16px',
-                        overflow: 'hidden'
-                      }}>
-                        {attachmentPreviews.map((preview, index) => (
-                          <div key={index} style={{ position: 'relative', aspectRatio: '16/9' }}>
-                            {preview !== 'file-icon' ? (
-                              <img src={preview} alt="Превью" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              <div style={{ 
-                                width: '100%', 
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'var(--background-light)'
-                              }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2">
-                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                  <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                              </div>
-                            )}
-                            <button 
-                              onClick={() => removeAttachment(index)}
-                              style={{
-                                position: 'absolute',
-                                top: '8px',
-                                right: '8px',
-                                width: '24px',
-                                height: '24px',
-                                borderRadius: '50%',
-                                background: 'rgba(0, 0, 0, 0.6)',
-                                border: 'none',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                              </svg>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    >
+                      Написание
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTab('preview')}
+                      style={{ 
+                        background: 'transparent',
+                        border: 'none',
+                        color: currentTab === 'preview' ? 'var(--accent-color)' : 'var(--text-secondary)',
+                        fontWeight: currentTab === 'preview' ? 'bold' : 'normal',
+                        cursor: 'pointer',
+                        padding: '0 10px'
+                      }}
+                    >
+                      Предпросмотр
+                    </button>
                   </div>
                 </div>
-
-                {/* Toolbar */}
+                
                 <div style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderTop: '1px solid var(--border-color)',
-                  paddingTop: '15px',
-                  marginBottom: '15px'
+                  position: 'relative',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--input-bg)',
+                  overflow: 'hidden'
                 }}>
-                  {/* Format buttons */}
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('bold')}
-                      title="Жирный текст"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-                        <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-                      </svg>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('italic')}
-                      title="Курсив"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="19" y1="4" x2="10" y2="4"></line>
-                        <line x1="14" y1="20" x2="5" y2="20"></line>
-                        <line x1="15" y1="4" x2="9" y2="20"></line>
-                      </svg>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('heading')}
-                      title="Заголовок"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M6 4v16"></path>
-                        <path d="M18 4v16"></path>
-                        <path d="M6 12h12"></path>
-                      </svg>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('list')}
-                      title="Список"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="8" y1="6" x2="21" y2="6"></line>
-                        <line x1="8" y1="12" x2="21" y2="12"></line>
-                        <line x1="8" y1="18" x2="21" y2="18"></line>
-                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                      </svg>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('link')}
-                      title="Ссылка"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                      </svg>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => insertFormat('code')}
-                      title="Код"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="16 18 22 12 16 6"></polyline>
-                        <polyline points="8 6 2 12 8 18"></polyline>
-                      </svg>
-                    </button>
-                  </div>
+                  {currentTab === 'write' ? (
+                    <>
+                      <textarea
+                        id="content"
+                        ref={contentRef}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="Расскажите свою историю..."
+                        onFocus={() => setShowToolbar(true)}
+                        style={{ 
+                          width: '100%',
+                          padding: '15px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          color: 'var(--text-primary)',
+                          minHeight: '300px',
+                          resize: 'vertical',
+                          outline: 'none',
+                          fontSize: '1rem',
+                          lineHeight: '1.6',
+                          fontFamily: 'inherit'
+                        }}
+                      ></textarea>
+                      
+                      {/* Attachments preview */}
+                      <div style={{ padding: '0 15px' }}>
+                        {attachmentPreviews.length > 0 && (
+                          <div style={{ 
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                            gap: '10px',
+                            marginBottom: '15px'
+                          }}>
+                            {attachmentPreviews.map((preview, index) => (
+                              <div 
+                                key={index} 
+                                style={{ 
+                                  position: 'relative',
+                                  aspectRatio: '1/1',
+                                  borderRadius: '8px',
+                                  overflow: 'hidden'
+                                }}
+                              >
+                                <img 
+                                  src={preview} 
+                                  alt={`Attachment ${index + 1}`} 
+                                  style={{ 
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                  }} 
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeAttachment(index)}
+                                  style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '50%',
+                                    background: 'var(--bg-secondary)',
+                                    border: 'none',
+                                    color: 'var(--text-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div 
+                      dangerouslySetInnerHTML={{ __html: previewContent }}
+                      style={{ 
+                        padding: '15px',
+                        color: 'var(--text-primary)',
+                        minHeight: '300px',
+                        fontSize: '1rem',
+                        lineHeight: '1.6'
+                      }}
+                    ></div>
+                  )}
                   
-                  <div style={{ flex: 1 }}></div>
-                  
-                  {/* Media and emoji buttons */}
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      title="Добавить изображение"
-                      style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <polyline points="21 15 16 10 5 21"></polyline>
-                      </svg>
-                    </button>
-                    
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      onChange={handleFileSelect} 
-                      accept="image/*" 
-                      multiple 
-                      style={{ display: 'none' }} 
-                    />
-                    
-                    <div style={{ position: 'relative' }}>
+                  {/* Toolbar */}
+                  <div style={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    borderTop: '1px solid var(--border-color)',
+                    paddingTop: '15px',
+                    marginBottom: '15px',
+                    padding: '15px'
+                  }}>
+                    {/* Format buttons */}
+                    <div style={{ display: 'flex', gap: '12px' }}>
                       <button
                         type="button"
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                        title="Эмодзи"
-                        style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer' }}
+                        onClick={() => insertFormat('bold')}
+                        title="Жирный текст"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                          <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+                          <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
                         </svg>
                       </button>
                       
-                      {showEmojiPicker && (
-                        <div 
-                          ref={emojiPickerRef}
-                          style={{ 
-                            position: 'absolute',
-                            bottom: '30px',
-                            right: '0',
-                            background: 'var(--background-elevated)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '16px',
-                            padding: '15px',
-                            width: '300px',
-                            zIndex: 10,
-                            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)'
-                          }}
+                      <button
+                        type="button"
+                        onClick={() => insertFormat('italic')}
+                        title="Курсив"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="19" y1="4" x2="10" y2="4"></line>
+                          <line x1="14" y1="20" x2="5" y2="20"></line>
+                          <line x1="15" y1="4" x2="9" y2="20"></line>
+                        </svg>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={() => insertFormat('heading')}
+                        title="Заголовок"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M6 4v16"></path>
+                          <path d="M18 4v16"></path>
+                          <path d="M6 12h12"></path>
+                        </svg>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={() => insertFormat('list')}
+                        title="Список"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="8" y1="6" x2="21" y2="6"></line>
+                          <line x1="8" y1="12" x2="21" y2="12"></line>
+                          <line x1="8" y1="18" x2="21" y2="18"></line>
+                          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={() => insertFormat('link')}
+                        title="Ссылка"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={() => insertFormat('code')}
+                        title="Код"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="16 18 22 12 16 6"></polyline>
+                          <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <div style={{ flex: 1 }}></div>
+                    
+                    {/* Media and emoji buttons */}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        title="Добавить изображение"
+                        style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                      </button>
+                      
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleFileSelect} 
+                        accept="image/*" 
+                        multiple 
+                        style={{ display: 'none' }} 
+                      />
+                      
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          title="Эмодзи"
+                          style={{ background: 'transparent', border: 'none', color: 'var(--accent-color)', cursor: 'pointer' }}
                         >
-                          <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>Часто используемые</div>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '5px' }}>
-                            {['😊', '👍', '🔥', '❤️', '😂', '🤔', '👏', '✨', '🎉', '🚀', '💯', '🙏', '😍', '💪', '🤩', '😎'].map((emoji, i) => (
-                              <button 
-                                key={i} 
-                                onClick={() => insertEmoji(emoji)}
-                                style={{ 
-                                  background: 'transparent', 
-                                  border: 'none', 
-                                  fontSize: '20px',
-                                  cursor: 'pointer',
-                                  padding: '5px',
-                                  borderRadius: '4px'
-                                }}
-                              >
-                                {emoji}
-                              </button>
-                            ))}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                          </svg>
+                        </button>
+                        
+                        {showEmojiPicker && (
+                          <div 
+                            ref={emojiPickerRef}
+                            style={{ 
+                              position: 'absolute',
+                              bottom: '30px',
+                              right: '0',
+                              background: 'var(--card-bg)',
+                              border: '1px solid var(--border-color)',
+                              borderRadius: '16px',
+                              padding: '15px',
+                              width: '300px',
+                              zIndex: 10,
+                              boxShadow: 'var(--shadow)'
+                            }}
+                          >
+                            <div style={{ marginBottom: '10px', fontWeight: 'bold', color: 'var(--text-primary)' }}>Часто используемые</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '5px' }}>
+                              {['😊', '👍', '🔥', '❤️', '😂', '🤔', '👏', '✨', '🎉', '🚀', '💯', '🙏', '😍', '💪', '🤩', '😎'].map((emoji, i) => (
+                                <button 
+                                  key={i} 
+                                  onClick={() => insertEmoji(emoji)}
+                                  style={{ 
+                                    background: 'transparent', 
+                                    border: 'none', 
+                                    fontSize: '20px',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    borderRadius: '4px',
+                                    transition: 'background-color 0.2s ease'
+                                  }}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
+                </div>
               </div>
               
-                {/* Genre and Tags section */}
-                <div style={{ 
-                  marginBottom: '20px',
-                  padding: '15px',
-                  background: 'var(--background-light)',
-                  borderRadius: '12px',
-                }}>
-                  <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                      Жанр
-                    </label>
+              <div style={{ marginBottom: '20px' }}>
+                <label htmlFor="genre" style={{ display: 'block', marginBottom: '5px', color: 'var(--text-secondary)' }}>
+                  Жанр (необязательно)
+                </label>
                 <select
+                  id="genre"
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
+                  className="form-control"
                   style={{ 
-                        width: '100%',
-                        background: 'var(--background)',
-                        color: 'var(--text-primary)',
+                    width: '100%',
+                    padding: '10px 15px',
+                    borderRadius: '8px',
                     border: '1px solid var(--border-color)',
-                        padding: '10px',
-                        borderRadius: '8px',
-                    appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231d9bf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 10px center',
-                        backgroundSize: '16px'
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 >
                   <option value="">Выберите жанр</option>
-                  {genres.map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
+                  <option value="Фэнтези">Фэнтези</option>
+                  <option value="Научная фантастика">Научная фантастика</option>
+                  <option value="Детектив">Детектив</option>
+                  <option value="Роман">Роман</option>
+                  <option value="Триллер">Триллер</option>
+                  <option value="Ужасы">Ужасы</option>
+                  <option value="Приключения">Приключения</option>
+                  <option value="Другое">Другое</option>
                 </select>
               </div>
               
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                      Теги (через запятую)
-                    </label>
+              <div style={{ marginBottom: '20px' }}>
+                <label htmlFor="tags" style={{ display: 'block', marginBottom: '5px', color: 'var(--text-secondary)' }}>
+                  Теги (через запятую, необязательно)
+                </label>
                 <input
                   type="text"
+                  id="tags"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                      placeholder="Добавьте теги через запятую"
+                  className="form-control"
+                  placeholder="фантастика, дракон, магия"
                   style={{ 
-                        width: '100%',
-                        background: 'var(--background)',
-                        color: 'var(--text-primary)',
+                    width: '100%',
+                    padding: '10px 15px',
+                    borderRadius: '8px',
                     border: '1px solid var(--border-color)',
-                        padding: '10px',
-                        borderRadius: '8px'
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
-                  </div>
               </div>
               
-                {/* Character count and autosave status */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '20px',
-                  color: 'var(--text-secondary)',
-                  fontSize: '14px'
-                }}>
-                  <div>
-                    {characterCount ? `${characterCount} символов • ${wordCount} слов` : ''}
-                  </div>
-                  <div>
-                    {savedStatus && savedStatus}
-                  </div>
-              </div>
-              
-                {/* Submit and Actions */}
-              <div style={{ 
-                display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '20px'
-                }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
                   <button
                     type="button"
                     onClick={clearDraft}
                     style={{ 
                       background: 'transparent',
                       border: 'none',
-                      color: 'var(--danger-color)',
-                      cursor: 'pointer',
-                      padding: '10px'
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer'
                     }}
                   >
                     Очистить черновик
                   </button>
                   
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ 
-                      background: 'var(--primary-color)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '9999px',
-                      padding: '10px 20px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                      gap: '8px'
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" strokeDasharray="30 30" strokeDashoffset="0">
-                          <animateTransform 
-                            attributeName="transform"
-                            attributeType="XML"
-                            type="rotate"
-                            from="0 12 12"
-                            to="360 12 12"
-                            dur="1s"
-                            repeatCount="indefinite"
-                          />
-                          </circle>
-                      </svg>
-                      Публикация...
-                    </>
-                  ) : (
-                      'Опубликовать'
+                  {savedStatus && (
+                    <span style={{ 
+                      marginLeft: '10px', 
+                      fontSize: '14px',
+                      color: 'var(--success-color)'
+                    }}>
+                      {savedStatus}
+                    </span>
                   )}
-                </button>
                 </div>
-              </form>
-            )}
-
-            {/* Preview Tab */}
-            {currentTab === 'preview' && (
-              <div>
-                <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>{title || 'Название истории'}</h2>
                 
-                <div 
-                  className="preview-content"
-                  style={{ fontSize: '18px', lineHeight: '1.6' }}
-                  dangerouslySetInnerHTML={{ __html: previewContent || '<p>Предпросмотр содержимого будет отображаться здесь...</p>' }}
-                />
-                
-                {attachmentPreviews.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ 
-                    display: 'grid',
-                    gridTemplateColumns: attachmentPreviews.length === 1 ? '1fr' : attachmentPreviews.length === 3 ? '1fr 1fr 1fr' : '1fr 1fr',
-                    gap: '10px',
-                    marginTop: '20px',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '16px',
-                    overflow: 'hidden'
+                    fontSize: '14px',
+                    color: 'var(--text-secondary)'
                   }}>
-                    {attachmentPreviews.map((preview, index) => (
-                      <div key={index} style={{ position: 'relative', aspectRatio: '16/9' }}>
-                        {preview !== 'file-icon' ? (
-                          <img src={preview} alt="Превью" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ 
-                            width: '100%', 
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: 'var(--background-light)'
-                          }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                              <polyline points="14 2 14 8 20 8"></polyline>
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {wordCount} слов ({characterCount} символов)
                   </div>
-                )}
-                
-                {genre && (
-                  <div style={{ 
-                    display: 'inline-block',
-                    marginTop: '20px',
-                    padding: '5px 15px',
-                    background: 'var(--primary-light)',
-                    color: 'var(--primary-color)',
-                    borderRadius: '9999px',
-                    fontWeight: 'bold'
-                  }}>
-                    {genre}
-                  </div>
-                )}
-                
-                {tags && (
-                  <div style={{ 
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '10px',
-                    marginTop: '15px'
-                  }}>
-                    {tags.split(',').map((tag, index) => tag.trim() && (
-                      <div key={index} style={{ 
-                        color: 'var(--primary-color)',
-                        fontSize: '14px'
-                      }}>
-                        #{tag.trim().replace(/\s+/g, '')}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
-                  <button
-                    onClick={() => setCurrentTab('write')}
-                    style={{ 
-                      background: 'transparent',
-                      border: '1px solid var(--primary-color)',
-                      color: 'var(--primary-color)',
-                      borderRadius: '9999px',
-                      padding: '10px 20px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Вернуться к редактированию
-                  </button>
                   
                   <button
-                    onClick={handleSubmit}
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isSubmitting || !title.trim() || !content.trim()}
                     style={{ 
-                      background: 'var(--primary-color)',
+                      padding: '10px 20px',
+                      backgroundColor: 'var(--accent-color)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '9999px',
-                      padding: '10px 20px',
                       fontWeight: 'bold',
-                      cursor: 'pointer'
+                      cursor: isSubmitting || !title.trim() || !content.trim() ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    Опубликовать
-                </button>
+                    {isSubmitting ? 'Публикация...' : 'Опубликовать'}
+                  </button>
                 </div>
               </div>
-            )}
+            </form>
           </div>
         </div>
-        
-        {/* Trending section - right sidebar */}
-        {showTrends && (
-          <div 
-            style={{ 
-              width: '300px',
-              position: 'fixed',
-              right: '20px',
-              top: '80px',
-              background: 'var(--background-light)',
-              borderRadius: '16px',
-              padding: '15px',
-              border: '1px solid var(--border-color)'
-            }}
-          >
-            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>В тренде</h3>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '10px' }}>Популярные хэштеги</h4>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {trendingTags.map((tag, index) => (
-                  <div 
-                    key={index} 
-                    style={{ 
-                      color: 'var(--primary-color)',
-                      fontSize: '14px',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => {
-                      const currentTags = tags.length > 0 ? tags.split(',').map(t => t.trim()) : [];
-                      if (!currentTags.includes(tag)) {
-                        const newTags = [...currentTags, tag].join(', ');
-                        setTags(newTags);
-                      }
-                    }}
-                  >
-                    #{tag}
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '10px' }}>Советы по написанию</h4>
-              <ul style={{ paddingLeft: '20px', color: 'var(--text-primary)', fontSize: '14px' }}>
-                <li style={{ marginBottom: '8px' }}>Начните с яркого заголовка, который привлечет внимание</li>
-                <li style={{ marginBottom: '8px' }}>Используйте форматирование для выделения важных моментов</li>
-                <li style={{ marginBottom: '8px' }}>Добавьте изображение для большей выразительности</li>
-                <li style={{ marginBottom: '8px' }}>Используйте соответствующие хэштеги для лучшего поиска</li>
-              </ul>
-            </div>
-            
-            <div>
-              <button
-                onClick={() => setShowTrends(false)}
-                style={{ 
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-secondary)',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  padding: '5px 0'
-                }}
-              >
-                Скрыть блок
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -53,7 +53,7 @@ const StoryDetailPage: React.FC = () => {
     formattedContent = formattedContent.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     
     // Код
-    formattedContent = formattedContent.replace(/`([^`]+)`/g, '<code style="background-color: var(--background-light); padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</code>');
+    formattedContent = formattedContent.replace(/`([^`]+)`/g, '<code style="background-color: var(--bg-secondary); padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</code>');
     
     // Списки
     formattedContent = formattedContent.replace(/^- (.*?)$/gm, '<li>$1</li>');
@@ -104,7 +104,7 @@ const StoryDetailPage: React.FC = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" stroke="var(--primary-color)" strokeWidth="4" strokeDasharray="30 30" strokeDashoffset="0">
+              <circle cx="12" cy="12" r="10" stroke="var(--accent-color)" strokeWidth="4" strokeDasharray="30 30" strokeDashoffset="0">
                 <animateTransform
                   attributeName="transform"
                   attributeType="XML"
@@ -142,7 +142,7 @@ const StoryDetailPage: React.FC = () => {
               display: 'inline-block',
               marginTop: '15px',
               padding: '10px 20px',
-              background: 'var(--primary-color)',
+              background: 'var(--accent-color)',
               color: 'white',
               borderRadius: '9999px',
               textDecoration: 'none',
@@ -163,7 +163,7 @@ const StoryDetailPage: React.FC = () => {
   const attachmentsCount = story.attachments?.length || 0;
 
   return (
-    <div style={{ backgroundColor: 'var(--background)' }}>
+    <div style={{ backgroundColor: 'var(--bg-primary)' }}>
       <Navbar />
       <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
         {/* Шапка с автором */}
@@ -212,10 +212,12 @@ const StoryDetailPage: React.FC = () => {
         
         {/* Контент истории */}
         <div style={{ 
-          backgroundColor: 'var(--background)', 
+          backgroundColor: 'var(--card-bg)', 
           borderRadius: '16px', 
           overflow: 'hidden',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          border: '1px solid var(--border-color)',
+          padding: '20px'
         }}>
           <h1 style={{ 
             fontSize: '28px', 
@@ -256,7 +258,7 @@ const StoryDetailPage: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: 'var(--background-light)'
+                      background: 'var(--bg-secondary)'
                     }}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -278,7 +280,7 @@ const StoryDetailPage: React.FC = () => {
                 padding: '5px 15px', 
                 borderRadius: '9999px',
                 fontSize: '14px',
-                color: 'var(--primary-color)',
+                color: 'var(--accent-color)',
                 marginBottom: '10px',
                 marginRight: '10px',
                 fontWeight: 'bold'
@@ -295,7 +297,7 @@ const StoryDetailPage: React.FC = () => {
                 marginTop: '10px'
               }}>
                 {story.tags.map((tag, index) => (
-                  <span key={index} style={{ color: 'var(--primary-color)', fontSize: '14px' }}>
+                  <span key={index} style={{ color: 'var(--accent-color)', fontSize: '14px' }}>
                     #{tag}
                   </span>
                 ))}

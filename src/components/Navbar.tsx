@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -34,6 +35,10 @@ const Navbar: React.FC = () => {
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg>
           </Link>
+        </div>
+        
+        <div className="nav-item">
+          <ThemeToggle />
         </div>
         
         {isAuthenticated ? (

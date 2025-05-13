@@ -1,4 +1,56 @@
+/* THEME VARIABLES */
 :root {
+  /* Light Theme Colors */
+  --light-bg-primary: #ffffff;
+  --light-bg-secondary: #f5f8fa;
+  --light-text-primary: #1a202c;
+  --light-text-secondary: #4a5568;
+  --light-border-color: #e2e8f0;
+  --light-accent-color: #3498db;
+  --light-accent-hover: #2980b9;
+  --light-danger-color: #e53e3e;
+  --light-success-color: #38a169;
+  --light-card-bg: #ffffff;
+  --light-input-bg: #ffffff;
+  --light-input-border: #cbd5e0;
+  --light-dropdown-bg: #ffffff;
+  --light-dropdown-hover: #edf2f7;
+  --light-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Dark Theme Colors */
+  --dark-bg-primary: #121212;
+  --dark-bg-secondary: #1e1e1e;
+  --dark-text-primary: #e7e9ea;
+  --dark-text-secondary: #a0aec0;
+  --dark-border-color: #2d3748;
+  --dark-accent-color: #3182ce;
+  --dark-accent-hover: #2b6cb0;
+  --dark-danger-color: #f56565;
+  --dark-success-color: #48bb78;
+  --dark-card-bg: #1e1e1e;
+  --dark-input-bg: #2d3748;
+  --dark-input-border: #4a5568;
+  --dark-dropdown-bg: #2d3748;
+  --dark-dropdown-hover: #4a5568;
+  --dark-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+  /* Default to dark theme */
+  --bg-primary: var(--dark-bg-primary);
+  --bg-secondary: var(--dark-bg-secondary);
+  --text-primary: var(--dark-text-primary);
+  --text-secondary: var(--dark-text-secondary);
+  --border-color: var(--dark-border-color);
+  --accent-color: var(--dark-accent-color);
+  --accent-hover: var(--dark-accent-hover);
+  --danger-color: var(--dark-danger-color);
+  --success-color: var(--dark-success-color);
+  --card-bg: var(--dark-card-bg);
+  --input-bg: var(--dark-input-bg);
+  --input-border: var(--dark-input-border);
+  --dropdown-bg: var(--dark-dropdown-bg);
+  --dropdown-hover: var(--dark-dropdown-hover);
+  --shadow: var(--dark-shadow);
+
   --primary-color: #1d9bf0;
   --primary-hover: #1a8cd8;
   --primary-light: rgba(29, 155, 240, 0.1);
@@ -7,12 +59,7 @@
   --background: #000000;
   --background-light: #16181c;
   --background-elevated: #202327;
-  --text-primary: #e7e9ea;
-  --text-secondary: #71767b;
   --text-highlight: #1d9bf0;
-  --border-color: #2f3336;
-  --danger-color: #f4212e;
-  --success-color: #00ba7c;
   --warning-color: #ffb93d;
   --card-radius: 16px;
   --button-radius: 9999px;
@@ -21,21 +68,43 @@
   --shadow-2: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  transition: background-color var(--transition-speed) ease, 
-              color var(--transition-speed) ease;
+/* Apply light theme */
+[data-color-mode="light"] {
+  --bg-primary: var(--light-bg-primary);
+  --bg-secondary: var(--light-bg-secondary);
+  --text-primary: var(--light-text-primary);
+  --text-secondary: var(--light-text-secondary);
+  --border-color: var(--light-border-color);
+  --accent-color: var(--light-accent-color);
+  --accent-hover: var(--light-accent-hover);
+  --danger-color: var(--light-danger-color);
+  --success-color: var(--light-success-color);
+  --card-bg: var(--light-card-bg);
+  --input-bg: var(--light-input-bg);
+  --input-border: var(--light-input-border);
+  --dropdown-bg: var(--light-dropdown-bg);
+  --dropdown-hover: var(--light-dropdown-hover);
+  --shadow: var(--light-shadow);
 }
 
+/* Apply common styles */
 body {
   font-family: 'Chirp', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.6;
-  background-color: var(--background);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
 }
 
 .container {
@@ -60,12 +129,13 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--accent-hover);
+  color: white;
 }
 
 .btn-outline {
@@ -95,11 +165,12 @@ body {
 
 /* Стилизация карточек */
 .card {
-  background-color: var(--background);
+  background-color: var(--card-bg);
   border-radius: var(--card-radius);
   border: 1px solid var(--border-color);
   margin-bottom: 1rem;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .card-header {
@@ -122,7 +193,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: var(--bg-primary);
   backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
@@ -155,16 +226,28 @@ body {
 }
 
 .nav-link {
-  color: var(--text-primary);
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
   padding: 0.75rem;
   border-radius: 9999px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-link:hover {
-  background-color: var(--background-light);
+  background-color: var(--bg-secondary);
+  color: var(--accent-color);
+}
+
+.nav-link svg {
+  transition: stroke 0.2s ease;
+}
+
+.nav-link:hover svg {
+  stroke: var(--accent-color);
 }
 
 /* Формы */
@@ -207,6 +290,7 @@ label {
   border-radius: 50%;
   overflow: hidden;
   background-color: var(--background-elevated);
+  border: 2px solid var(--accent-color);
 }
 
 .avatar img {
@@ -225,9 +309,9 @@ label {
   top: 100%;
   right: 0;
   min-width: 200px;
-  background-color: var(--background);
+  background-color: var(--dropdown-bg);
   border-radius: 16px;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow);
   z-index: 1000;
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -245,7 +329,8 @@ label {
 }
 
 .dropdown-item:hover {
-  background-color: var(--background-light);
+  background-color: var(--dropdown-hover);
+  color: var(--text-primary);
 }
 
 @keyframes fadeIn {
@@ -411,4 +496,9 @@ label {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
+}
+
+/* Theme toggle specific styles */
+.theme-toggle:hover {
+  background-color: var(--bg-secondary);
 }
